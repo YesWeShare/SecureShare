@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureShare - Private File Transfer</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text x=50 y=50 font-size=50%22dominant-baseline=middle%22>🔒</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                }
+            }
+        }
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #8b5cf6;
+            --navy: #1e293b;
+            --light: #f8fafc;
+            --muted: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+        body { opacity: 0; transition: opacity 0.3s; }
+        body.loaded { opacity: 1; }
+    </style>
+</head>
+<body class="loaded">
+    <header class="header border-b">
+        <div class="max-w-7xl mx-auto py-4 px-6 flex items-center justify-between">
+            <a href="#home" class="flex items-center gap-2">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                    <svg width="28" height="28" viewBox="0 0 100 100" fill="none">
+                        <circle cx="50" cy="50" r="45" fill="currentColor"/>
+                        <path d="M50 35 L50 20 L70 40 L75 45 L70 50 L50 70 L30 50 L25 45 L30 50 L50 35 Z" fill="white"/>
+                        <path d="M50 65 L50 80 L30 85 L25 80 L30 75 L50 55 L70 75 L75 80 L70 85 L50 80 Z" fill="white"/>
+                    </svg>
+                </div>
+                <span class="text-xl font-bold text-navy">SecureShare</span>
+            </a>
+            
+            <nav class="hidden md:block">
+                <a href="#how-it-works" class="mx-4 text-text-primary hover:text-primary-dark transition-colors text-sm font-medium">How It Works</a>
+                <a href="#security" class="mx-4 text-text-primary hover:text-primary-dark transition-colors text-sm font-medium">Security</a>
+                <a href="#pricing" class="mx-4 text-text-primary hover:text-primary-dark transition-colors text-sm font-medium">Pricing</a>
+            </nav>
+            
+            <div class="flex items-center gap-3">
+                <a href="#login" class="text-sm font-medium text-text-primary hover:text-primary transition-colors">Login</a>
+                <a href="#signup" class="text-sm font-medium bg-primary/10 text-primary hover:bg-primary/20 rounded-md px-3 py-1.5 transition-colors">Sign Up</a>
+                <button class="btn-primary px-4 py-2 rounded-md text-sm font-medium">Get Started</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="min-h-[520px] flex flex-col items-center justify-center text-center py-20 px-6">
+            <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-navy mb-4 max-w-2xl">
+                Share Files Securely.<br>Anywhere. Anytime.
+            </h1>
+            <p class="text-lg text-text-primary mb-8 max-w-2xl">
+                Upload your files, generate a QR code or six-digit code, and securely receive them on any device.
+            </p>
+            <div class="flex gap-4 justify-center">
+                <a href="#send" class="btn-primary px-8 py-3 rounded-full font-medium transition-all hover:shadow-lg hover:shadow-primary/25">
+                    Start Sharing
+                </a>
+                <a href="#how-it-works" class="btn-outline px-8 py-3 rounded-full font-medium transition-all hover:bg-primary/10 hover:text-primary">
+                    How It Works
+                </a>
+            </div>
+            <p class="mt-6 text-sm text-text-primary">
+                Up to 50 MB per transfer | Privacy-focused file sharing
+            </p>
+        </section>
+    </main>
+</body>
+</html>

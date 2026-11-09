@@ -1,0 +1,251 @@
+/// <reference types="node" />
+
+import { PrismaSchema, Prisma } from '@prisma/client';
+
+const schema: Prisma.Schema = {
+  model User {
+    id                        String              @id @default(uuid())
+    fullName                  String              @db.VarChar(191)
+    email                     String              @db.VarChar(191) @unique
+    passwordHash              String              @db.VarChar(255)
+    emailVerified             DateTime?           @db.Nullable
+    accountType               String              @default('FREE')        @enum(['FREE', 'PREMIUM'])
+    subscriptionStatus        String              @default('ACTIVE')      @enum(['ACTIVE', 'PAST_DUE', 'CANCELLED'])
+    storageUsed               Int                 @default(0)
+    storageQuota              Int                 @default(50 * 1024 * 1024)
+    createdAt                 DateTime            @default(now())
+    updatedAt                 DateTime            @updatedAt
+    deletedAt                 DateTime?           @db.Nullable
+  }
+
+  model Transfer {
+    id                        String              @id @default(uuid())
+    transferIdentifier        String              @db.VarChar(64) @unique
+    senderUserId              String              @db.VarChar(36)
+    encryptionKeyId           String              @db.VarChar(36)
+    transferCodeHash          String
+    transferStatus            String              @default('ACTIVE')      @enum(['ACTIVE', 'EXPIRED', 'COMPLETED', 'DELETED'])
+    encryptedMetadata         String
+    totalSize                 Int
+    expiresAt                 DateTime
+    deletedAt                 DateTime?           @db.Nullable
+    createdAt                 DateTime            @default(now())
+
+    sender                    User                @relation(fields: [senderUserId], references: [id])
+    @@map('transfers')
+    @@index([senderUserId])
+    @@index([transferStatus])
+    @@index([expiresAt])
+  }
+
+  model File {
+    id                        String              @id @default(uuid())
+    transferId                String              @db.VarChar(36)
+    encryptedStorageKey       String
+    encryptedFilename         String
+    encryptedFileMetadata     String
+    fileSize                  Int
+    encryptionVersion         String              @default('V1')
+    createdAt                 DateTime            @default(now())
+
+    transfer                  Transfer            @relation(fields: [transferId], references: [id]) @onDelete('CASCADE')
+    @@map('files')
+    @@index([transferId])
+  }
+
+  model PairingRequest {
+    id                        String              @id @default(uuid())
+    transferId                String              @db.VarChar(36)
+    receiverPublicKey         String
+    pairingStatus             String              @default('PENDING')   @enum(['PENDING', 'APPROVED', 'REJECTED', 'EXPIRED'])
+    expiresAt                 DateTime
+    createdAt                 DateTime            @default(now())
+
+    transfer                  Transfer            @relation(fields: [transferId], references: [id]) @onDelete('CASCADE')
+    @@map('pairing_requests')
+    @@index([transferId])
+    @@index([pairingStatus])
+  }
+
+  model DownloadRecord {
+    id                        String              @id @default(uuid())
+    transferId                String              @db.VarChar(36)
+    receiverSessionId         String
+    downloadStatus            String              @default('PENDING')   @enum(['PENDING', 'IN_PROGRESS', 'COMPLETED', 'FAILED'])
+    downloadedAt              DateTime?           @db.Nullable
+    createdAt                 DateTime            @default(now())
+
+    transfer                  Transfer            @relation(fields: [transferId], references: [id]) @onDelete('SET NULL')
+    @@map('download_records')
+    @@index([transferId])
+    @@index([downloadStatus])
+  }
+
+  model Subscription {
+    id                        String              @id @default(uuid())
+    userId                    String              @db.VarChar(36)
+    planName                  String              @enum(['FREE', 'PREMIUM']) @default('FREE')
+    paymentStatus             String              @default('PAID')        @enum(['PAID', 'PENDING', 'FAILED', 'CANCELLED'])
+    subscriptionStart         DateTime
+    subscriptionEnd           DateTime?           @db.Nullable
+    autoRenew                 Boolean             @default(true)
+    createdAt                 DateTime            @default(now())
+    updatedAt                 DateTime            @updatedAt
+
+    user                      User                @relation(fields: [userId], references: [id]) @onDelete('CASCADE')
+    @@map('subscriptions')
+    @@unique([userId])
+    @@index([planName])
+    @@index([subscriptionEnd])
+  }
+
+  model UsageRecord {
+    id                        String              @id @default(uuid())
+    userId                    String              @db.VarChar(36)
+    operationType             String
+    transferId                String              @db.VarChar(36) @nullable
+    createdAt                 DateTime            @default(now())
+
+    user                      User                @relation(fields: [userId], references: [id]) @onDelete('CASCADE')
+    transfer                  Transfer            @relation(fields: [transferId], references: [id]) @onDelete('SET NULL')
+    @@map('usage_records')
+    @@index([userId])
+    @@index([operationType])
+    @@index([createdAt])
+  }
+}
+/// <reference types="node" />
+
+import { PrismaSchema, Prisma } from '@prisma/client';
+
+const schema: Prisma.Schema = {
+  model User {
+    id                        String              @id @default(uuid())
+    fullName                  String              @db.VarChar(191)
+    email                     String              @db.VarChar(191) @unique
+    passwordHash              String              @db.VarChar(255)
+    emailVerified             DateTime?           @db.Nullable
+    accountType               String              @default('FREE')        @enum(['FREE', 'PREMIUM'])
+    subscriptionStatus        String              @default('ACTIVE')      @enum(['ACTIVE', 'PAST_DUE', 'CANCELLED'])
+    storageUsed               Int                 @default(0)
+    storageQuota              Int                 @default(50 * 1024 * 1024)
+    createdAt                 DateTime            @default(now())
+    updatedAt                 DateTime            @updatedAt
+    deletedAt                 DateTime?           @db.Nullable
+  }
+
+  model Transfer {
+    id                        String              @id @default(uuid())
+    transferIdentifier        String              @db.VarChar(64) @unique
+    senderUserId              String              @db.VarChar(36)
+    encryptionKeyId           String              @db.VarChar(36)
+    transferCodeHash          String
+    transferStatus            String              @default('ACTIVE')      @enum(['ACTIVE', 'EXPIRED', 'COMPLETED', 'DELETED'])
+    encryptedMetadata         String
+    totalSize                 Int
+    expiresAt                 DateTime
+    deletedAt                 DateTime?           @db.Nullable
+    createdAt                 DateTime            @default(now())
+
+    sender                    User                @relation(fields: [senderUserId], references: [id])
+    @@map('transfers')
+    @@index([senderUserId])
+    @@index([transferStatus])
+    @@index([expiresAt])
+  }
+
+  model File {
+    id                        String              @id @default(uuid())
+    transferId                String              @db.VarChar(36)
+    encryptedStorageKey       String
+    encryptedFilename         String
+    encryptedFileMetadata     String
+    fileSize                  Int
+    encryptionVersion         String              @default('V1')
+    createdAt                 DateTime            @default(now())
+
+    transfer                  Transfer            @relation(fields: [transferId], references: [id]) @onDelete('CASCADE')
+    @@map('files')
+    @@index([transferId])
+  }
+
+  model PairingRequest {
+    id                        String              @id @default(uuid())
+    transferId                String              @db.VarChar(36)
+    receiverPublicKey         String
+    pairingStatus             String              @default('PENDING')   @enum(['PENDING', 'APPROVED', 'REJECTED', 'EXPIRED'])
+    expiresAt                 DateTime
+    createdAt                 DateTime            @default(now())
+
+    transfer                  Transfer            @relation(fields: [transferId], references: [id]) @onDelete('CASCADE')
+    @@map('pairing_requests')
+    @@index([transferId])
+    @@index([pairingStatus])
+  }
+
+  model DownloadRecord {
+    id                        String              @id @default(uuid())
+    transferId                String              @db.VarChar(36)
+    receiverSessionId         String
+    downloadStatus            String              @default('PENDING')   @enum(['PENDING', 'IN_PROGRESS', 'COMPLETED', 'FAILED'])
+    downloadedAt              DateTime?           @db.Nullable
+    createdAt                 DateTime            @default(now())
+
+    transfer                  Transfer            @relation(fields: [transferId], references: [id]) @onDelete('SET NULL')
+    @@map('download_records')
+    @@index([transferId])
+    @@index([downloadStatus])
+  }
+
+  model Subscription {
+    id                        String              @id @default(uuid())
+    userId                    String              @db.VarChar(36)
+    planName                  String              @enum(['FREE', 'PREMIUM']) @default('FREE')
+    paymentStatus             String              @default('PAID')        @enum(['PAID', 'PENDING', 'FAILED', 'CANCELLED'])
+    subscriptionStart         DateTime
+    subscriptionEnd           DateTime?           @db.Nullable
+    autoRenew                 Boolean             @default(true)
+    createdAt                 DateTime            @default(now())
+    updatedAt                 DateTime            @updatedAt
+
+    user                      User                @relation(fields: [userId], references: [id]) @onDelete('CASCADE')
+    @@map('subscriptions')
+    @@unique([userId])
+    @@index([planName])
+    @@index([subscriptionEnd])
+  }
+
+  model UsageRecord {
+    id                        String              @id @default(uuid())
+    userId                    String              @db.VarChar(36)
+    operationType             String
+    transferId                String              @db.VarChar(36) @nullable
+    createdAt                 DateTime            @default(now())
+
+    user                      User                @relation(fields: [userId], references: [id]) @onDelete('CASCADE')
+    transfer                  Transfer            @relation(fields: [transferId], references: [id]) @onDelete('SET NULL')
+    @@map('usage_records')
+    @@index([userId])
+    @@index([operationType])
+    @@index([createdAt])
+  }
+}
+/// <reference types="node" />
+
+import { PrismaSchema, Prisma } from '@prisma/client';
+
+const schema: Prisma.Schema = {
+  model User {
+    id                        String              @id @default(uuid())
+    fullName                  String              @db.VarChar(191)
+    email                     String              @db.VarChar(191) @unique
+    passwordHash              String              @db.VarChar(255)
+    emailVerified             DateTime?           @db.Nullable
+    accountType               String              @default('FREE')        @enum(['FREE', 'PREMIUM'])
+    subscriptionStatus        String              @default('ACTIVE')      @enum(['ACTIVE', 'PAST_DUE', 'CANCELLED'])
+    storageUsed               Int                 @default(0)
+    storageQuota              Int                 @default(50 * 1024 * 1024)
+    createdAt                 DateTime            @default(now())
+    updatedAt                 DateTime            @updatedAt
+    deletedAt                 DateTime?           @db.Nullable
+  }
