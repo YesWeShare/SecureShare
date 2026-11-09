@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.vite/
+.env
+**/.env
+.private-storage/
+**/.private-storage/
+secureshare/backend/.dev-db/

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>Share Files - SecureShare</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text x=50 y=50 font-size=50%22dominant-baseline=middle%22>🔒</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                }
+            }
+        };
+    </script>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #8b5cf6;
+            --navy: #1e293b;
+            --light: #f8fafc;
+            --muted: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+        body { opacity: 0; transition: opacity 0.3s; }
+        body.loaded { opacity: 1; }
+    </style>
+</head>
+<body class="loaded bg-navy/50">
+    <!-- Header -->
+    <header class="header border-b sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto py-4 px-6 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 text-navy hover:text-primary-dark transition-colors">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                    <svg width="28" height="28" viewBox="0 0 100 100" fill="none">
+                        <circle cx="50" cy="50" r="45" fill="currentColor"/>
+                        <path d="M50 35 L50 20 L70 40 L75 45 L70 50 L50 70 L30 50 L25 45 L30 50 L50 35 Z" fill="white"/>
+                        <path d="M50 65 L50 80 L30 85 L25 80 L30 75 L50 55 L70 75 L75 80 L70 85 L50 80 Z" fill="white"/>
+                    </svg>
+                </div>
+                <span class="text-xl font-bold">SecureShare</span>
+            </a>
+            
+            <div class="flex items-center gap-3">
+                <a href="/" class="text-sm font-medium text-text-primary hover:text-primary-dark transition-colors">Home</a>
+                <a href="#login" class="text-sm font-medium text-text-primary hover:text-primary transition-colors">Login</a>
+                <a href="#signup" class="text-sm font-medium bg-primary/10 text-primary hover:bg-primary/20 rounded-md px-3 py-1.5 transition-colors">Sign Up</a>
+            </div>
+        </div>
+        </header>
+        <main class="max-w-7xl mx-auto py-8 px-6 min-h-[calc(100vh-160px)]">
+        <div class="text-center mb-8">
+            <h2 id="page-heading" class="text-3xl font-bold text-navy mb-2">Share Files Securely</h2>
+            <p id="page-description" class="text-text-primary/60 text-lg">
+                Send files from one device and receive them securely on another.
+            </p>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+            <!-- LEFT CARD: SEND FILES -->
+            <div id="send-card" class="card border rounded-2xl p-6 lg:p-8 shadow-xl flex flex-col">
+                <div class="flex items-start gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="primary">
+                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                    </div>
+                    <div class="pt-1">
+                        <h3 class="text-xl font-bold text-navy mb-1">Send Files</h3>
+                        <p class="text-text-primary/60 text-sm">Upload files securely and share them instantly.</p>
+                    </div>
+                </div>
+
+                <!-- Drag and Drop Area -->
+                <div id="drop-zone" class="drop-zone flex-1 border-2 border-dashed border-primary/30 rounded-2xl p-6 md:p-8 hover:border-primary transition-colors cursor-pointer" onclick="document.getElementById('file-upload').click()">
+                    <div class="drop-icon mb-4">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="primary">
+                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                    </div>
+                    <h4 class="text-lg font-medium text-navy mb-2">Drag & Drop Files Here</h4>
+                    <p class="text-text-primary/60 text-sm mb-4">or click to browse files</p>
+                    <input type="file" id="file-upload" multiple accept="*/*" class="hidden">
+                    <button type="button" class="btn-browse mt-4">Browse Files</button>
+                </div>
+
+                <!-- File List -->
+                <div class="mt-6 hidden" id="upload-info">
+                    <div class="file-list" id="file-list"></div>
+                    <div class="file-summary mt-3">
+                        <span><span id="file-count">0 files</span> · Total: <span id="total-size">0 MB</span> · <span id="remaining-size">50 MB remaining</span></span>
+                    </div>
+                    <button type="button" id="remove-all" class="btn-remove-all mt-2">Remove All</button>
+                </div>
+
+                <section class="storage-duration mt-6" aria-labelledby="storage-duration-heading">
+                    <h4 id="storage-duration-heading" class="text-base font-semibold text-navy mb-1">How long should we store your files?</h4>
+                    <p class="text-text-primary/60 text-sm mb-4">Your files will remain securely available until your selected expiration date.</p>
+                    <div class="duration-options grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <label class="duration-option selected">
+                            <input type="radio" name="duration-days" value="1" checked>
+                            <span class="duration-value">1 Day</span>
+                        </label>
+                        <label class="duration-option">
+                            <input type="radio" name="duration-days" value="3">
+                            <span class="duration-value">3 Days</span>
+                        </label>
+                        <label class="duration-option">
+                            <input type="radio" name="duration-days" value="5">
+                            <span class="duration-value">5 Days</span>
+                        </label>
+                        <label class="duration-option">
+                            <input type="radio" name="duration-days" value="10">
+                            <span class="duration-value">10 Days</span>
+                        </label>
+                    </div>
+                </section>
+
+                <!-- Size Limit -->
+                <div class="mt-6 p-3 rounded-xl bg-primary/5 text-sm">
+                    <span>Maximum transfer size: <strong>50 MB</strong></span>
+                </div>
+                <div id="upload-status" class="mt-4 text-sm" role="status" aria-live="polite"></div>
+                <div id="upload-progress" class="mt-3 hidden" aria-live="polite">
+                    <div class="flex justify-between text-xs mb-1"><span id="upload-progress-label">Ready</span><span id="upload-progress-percent">0%</span></div>
+                    <progress id="upload-progress-bar" class="w-full" max="100" value="0"></progress>
+                </div>
+                <button type="button" id="upload-btn" class="btn-primary w-full py-3 rounded-md text-sm font-medium mt-4" disabled>Upload &amp; Generate Code</button>
+            </div>
+
+            <!-- RIGHT CARD: RECEIVE FILES -->
+            <div id="receive-card" class="card border rounded-2xl p-6 lg:p-8 shadow-xl flex flex-col">
+                <div class="flex items-start gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="primary">
+                            <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/>
+                            <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                            <line x1="9" y1="9" x2="9.01" y2="9"/>
+                        </svg>
+                    </div>
+                    <div class="pt-1">
+                        <h3 class="text-xl font-bold text-navy mb-1">Receive Files</h3>
+                        <p class="text-text-primary/60 text-sm">Get files instantly from another device.</p>
+                    </div>
+                </div>
+
+                <div class="receive-options flex-1">
+                    <!-- Option 1: QR Code Scanner -->
+                    <div class="option-box mb-6">
+                        <div class="flex items-start gap-3 mb-4">
+                            <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="primary">
+                                    <rect x="2" y="2" width="20" height="20" rx="2" ry="2"/>
+                                    <path d="M16 18v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4"/>
+                                    <line x1="8" y1="13" x2="16" y2="13" stroke="currentColor" stroke-width="1.5"/>
+                                    <line x1="12" y1="15" x2="12" y2="19" stroke="currentColor" stroke-width="1.5"/>
+                                </svg>
+                            </div>
+                            <div class="pt-1">
+                                <h4 class="text-lg font-medium text-navy mb-1">Scan QR Code</h4>
+                                <p class="text-text-primary/60 text-sm">Open camera to scan sender's QR code</p>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-secondary w-full py-3 rounded-md text-sm font-medium" id="qr-btn">Open Camera</button>
+                        <div class="mt-3 p-3 rounded-lg bg-primary/5">
+                            <p class="text-xs text-primary">Point camera at QR code</p>
+                            <p class="text-xs text-text-primary/60">Good lighting recommended</p>
+                        </div>
+                        <div id="camera-panel" class="hidden mt-4">
+                            <video id="camera-video" class="w-full rounded-lg" autoplay muted playsinline></video>
+                            <p id="camera-status" class="text-sm mt-2" role="status" aria-live="polite"></p>
+                            <button type="button" id="stop-camera" class="btn-secondary mt-2 px-4 py-2 rounded-md text-sm">Close Camera</button>
+                        </div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="flex items-center gap-4 mb-6">
+                        <span class="text-xs text-text-primary/60">OR</span>
+                        <div class="w-px h-6 bg-border rounded"></div>
+                    </div>
+
+                    <!-- Option 2: Six-Digit Code -->
+                    <div class="option-box">
+                        <div class="flex items-start gap-3 mb-4">
+                            <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="primary">
+                                    <rect x="2" y="6" width="20" height="12" rx="2" ry="2"/>
+                                    <path d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </div>
+                            <div class="pt-1">
+                                <h4 class="text-lg font-medium text-navy mb-1">Enter 6-Digit Code</h4>
+                                <p class="text-text-primary/60 text-sm">Manually enter the transfer code</p>
+                            </div>
+                        </div>
+                        <div class="code-input-wrapper mb-4">
+                            <div class="code-boxes" id="code-boxes"></div>
+                        </div>
+                        <p class="text-xs text-text-primary/60 mb-4">
+                            Automatically move to next box after entering a digit.<br>
+                            Support pasting all six digits.
+                        </p>
+                        <button type="button" class="btn-secondary w-full py-3 rounded-md text-sm font-medium" id="code-btn">Receive Files</button>
+                        <p class="text-xs text-text-primary/60 mt-3" id="code-error" style="display: none; color: var(--error);"></p>
+                    </div>
+                </div>
+                <div id="receive-status" class="mt-4 text-sm" role="status" aria-live="polite"></div>
+                <div id="receive-progress" class="mt-3 hidden" aria-live="polite">
+                    <div class="flex justify-between text-xs mb-1"><span id="receive-progress-label">Ready</span><span id="receive-progress-percent">0%</span></div>
+                    <progress id="receive-progress-bar" class="w-full" max="100" value="0"></progress>
+                </div>
+                <div id="receive-results" class="mt-4 hidden"></div>
+            </div>
+        </div>
+            </main>
+
+    <div id="transfer-completed" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center">
+        <div class="bg-white rounded-2xl p-8 shadow-xl w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="primary">
+                        <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+                        <polyline points="22 4 12 14 9 10.5 2 11"/>
+                    </svg>
+                </div>
+                <div class="pt-1">
+                    <h3 class="text-xl font-bold text-navy mb-1">Transfer Complete</h3>
+                    <p class="text-text-primary/60 text-sm">Your files are ready to share!</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col items-center gap-4">
+                <div class="relative">
+                    <canvas id="qr-canvas" width="150" height="150" class="rounded-lg"></canvas>
+                </div>
+
+                <div class="p-4 rounded-xl bg-primary/5 w-full text-left mb-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="font-mono font-bold text-primary text-lg" id="transfer-code">123456</span>
+                    </div>
+                </div>
+
+                <div class="file-list-completed mb-4" id="file-list-completed"></div>
+                <p class="text-sm text-text-primary/60">Transfer size: <span id="total-size-completed" class="font-mono text-primary"></span></p>
+
+                <div class="mb-4">
+                    <span class="text-sm text-text-primary/60">Uploaded:</span>
+                    <span id="uploaded-time" class="font-mono text-sm text-primary"></span>
+                </div>
+                <div class="mb-4">
+                    <span class="text-sm text-text-primary/60">Storage duration:</span>
+                    <span id="storage-duration-result" class="font-mono text-sm text-primary"></span>
+                </div>
+                <div class="mb-2">
+                    <span class="text-sm text-text-primary/60">Expires:</span>
+                    <span id="expiration-time" class="font-mono text-sm text-primary"></span>
+                </div>
+                <p id="expiration-countdown" class="text-sm font-medium text-primary mb-4"></p>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <button id="copy-code" class="btn-secondary py-2 rounded-md text-sm font-medium w-full">Copy Code</button>
+                    <button id="copy-link" class="btn-secondary py-2 rounded-md text-sm font-medium w-full">Copy Link</button>
+                </div>
+
+                <button id="download-qr" class="btn-secondary py-2 rounded-md text-sm font-medium w-full mb-4">Download QR Code</button>
+                <button id="share-transfer" class="btn-primary w-full py-2 rounded-md text-sm font-medium mb-4">Share</button>
+                <button id="delete-transfer" class="btn-secondary text-error w-full py-2 rounded-md text-sm font-medium">Delete Transfer</button>
+                <button id="upload-another" class="text-sm text-text-primary/60 mt-4">Upload Another</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="/share.js"></script>
+</body>
+</html>

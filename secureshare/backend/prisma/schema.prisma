@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TransferStatus {
+  UPLOADING
+  ACTIVE
+  EXPIRED
+  DELETED
+}
+
+enum DownloadStatus {
+  AVAILABLE
+  REQUESTED
+  COMPLETED
+  FAILED
+}
+
+model User {
+  id           String     @id @default(uuid()) @db.Uuid
+  fullName     String     @db.VarChar(191)
+  email        String     @unique @db.VarChar(191)
+  passwordHash String     @db.VarChar(255)
+  createdAt    DateTime   @default(now())
+  transfers    Transfer[]
+}
+
+model Transfer {
+  id                    String          @id @default(uuid()) @db.Uuid
+  senderUserId          String?         @db.Uuid
+  ownerTokenHash        String          @db.Char(64)
+  status                TransferStatus  @default(UPLOADING)
+  encryptedKeyEnvelope  String?         @db.Text
+  encryptedMetadata     String?         @db.Text
+  opaqueRegistration    String?         @db.Text
+  totalSize             Int
+  fileCount             Int             @default(0)
+  downloadCount         Int             @default(0)
+  storageDurationDays   Int             @default(1)
+  uploadedAt            DateTime?
+  expiresAt             DateTime
+  deletedAt             DateTime?
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+  sender                User?           @relation(fields: [senderUserId], references: [id], onDelete: SetNull)
+  files                 TransferFile[]
+  transferCode          TransferCode?
+  downloads             DownloadRecord[]
+
+  @@index([status, expiresAt])
+}
+
+model TransferCode {
+  id         String   @id @default(uuid()) @db.Uuid
+  codeHash   String   @unique @db.Char(64)
+  transferId String   @unique @db.Uuid
+  expiresAt  DateTime
+  transfer   Transfer @relation(fields: [transferId], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt])
+}
+
+model TransferFile {
+  id              String         @id @default(uuid()) @db.Uuid
+  transferId      String         @db.Uuid
+  objectKey       String         @unique @db.VarChar(512)
+  originalSize    Int
+  encryptedSize   Int
+  uploadedAt      DateTime?
+  downloadStatus  DownloadStatus @default(AVAILABLE)
+  transfer        Transfer       @relation(fields: [transferId], references: [id], onDelete: Cascade)
+
+  @@index([transferId])
+}
+
+model DownloadRecord {
+  id          String         @id @default(uuid()) @db.Uuid
+  transferId  String         @db.Uuid
+  status      DownloadStatus @default(REQUESTED)
+  createdAt   DateTime       @default(now())
+  completedAt DateTime?
+  transfer    Transfer       @relation(fields: [transferId], references: [id], onDelete: Cascade)
+
+  @@index([transferId, createdAt])
+}

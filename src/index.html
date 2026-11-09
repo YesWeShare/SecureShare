@@ -9,8 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="../css/style.css">
-    <style>
+    <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
@@ -21,7 +20,10 @@
                     },
                 }
             }
-        }
+        };
+    </script>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
         :root {
             --primary: #3b82f6;
             --primary-dark: #2563eb;
@@ -37,10 +39,11 @@
         body.loaded { opacity: 1; }
     </style>
 </head>
-<body class="loaded">
-    <header class="header border-b">
+<body class="loaded bg-white">
+    <!-- Navigation -->
+    <header class="header border-b sticky top-0 z-50">
         <div class="max-w-7xl mx-auto py-4 px-6 flex items-center justify-between">
-            <a href="#home" class="flex items-center gap-2">
+            <a href="/" class="flex items-center gap-2 text-navy hover:text-primary-dark transition-colors">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
                     <svg width="28" height="28" viewBox="0 0 100 100" fill="none">
                         <circle cx="50" cy="50" r="45" fill="currentColor"/>
@@ -48,7 +51,7 @@
                         <path d="M50 65 L50 80 L30 85 L25 80 L30 75 L50 55 L70 75 L75 80 L70 85 L50 80 Z" fill="white"/>
                     </svg>
                 </div>
-                <span class="text-xl font-bold text-navy">SecureShare</span>
+                <span class="text-xl font-bold">SecureShare</span>
             </a>
             
             <nav class="hidden md:block">
@@ -58,23 +61,26 @@
             </nav>
             
             <div class="flex items-center gap-3">
-                <a href="#login" class="text-sm font-medium text-text-primary hover:text-primary transition-colors">Login</a>
+                <a href="#login" class="text-sm font-medium text-text-primary hover:text-primary-dark transition-colors">Login</a>
                 <a href="#signup" class="text-sm font-medium bg-primary/10 text-primary hover:bg-primary/20 rounded-md px-3 py-1.5 transition-colors">Sign Up</a>
-                <button class="btn-primary px-4 py-2 rounded-md text-sm font-medium">Get Started</button>
+                <a href="/share" class="btn-primary px-4 py-2 rounded-md text-sm font-medium">Get Started</a>
             </div>
         </div>
     </header>
-
-    <main>
-        <section class="min-h-[520px] flex flex-col items-center justify-center text-center py-20 px-6">
-            <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-navy mb-4 max-w-2xl">
+    <section class="min-h-[520px] flex flex-col items-center justify-center text-center py-20 px-6">
+        <div class="text-center">
+            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium mb-4">
+                <span class="w-2 h-2 rounded-full bg-primary"></span>
+                PRIVATE & SECURE FILE SHARING
+            </span>
+            <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-navy mb-6 max-w-2xl leading-tight">
                 Share Files Securely.<br>Anywhere. Anytime.
             </h1>
-            <p class="text-lg text-text-primary mb-8 max-w-2xl">
+            <p class="text-lg text-text-primary mb-8 max-w-2xl leading-relaxed">
                 Upload your files, generate a QR code or six-digit code, and securely receive them on any device.
             </p>
-            <div class="flex gap-4 justify-center">
-                <a href="#send" class="btn-primary px-8 py-3 rounded-full font-medium transition-all hover:shadow-lg hover:shadow-primary/25">
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/share" class="btn-primary px-8 py-3 rounded-full font-medium text-lg transition-all hover:shadow-lg hover:shadow-primary/25">
                     Start Sharing
                 </a>
                 <a href="#how-it-works" class="btn-outline px-8 py-3 rounded-full font-medium transition-all hover:bg-primary/10 hover:text-primary">
@@ -84,7 +90,153 @@
             <p class="mt-6 text-sm text-text-primary">
                 Up to 50 MB per transfer | Privacy-focused file sharing
             </p>
-        </section>
-    </main>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-3xl font-bold text-navy text-center mb-12">How It Works</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="p-8 rounded-2xl bg-white shadow-lg text-center">
+                    <div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="primary">
+                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-navy mb-3">Upload Files</h3>
+                    <p class="text-text-primary/60 text-sm">Drag and drop files up to 50 MB.</p>
+                </div>
+                <div class="p-8 rounded-2xl bg-white shadow-lg text-center">
+                    <div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="primary">
+                            <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/>
+                            <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                            <line x1="9" y1="9" x2="9.01" y2="9"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-navy mb-3">Generate Code</h3>
+                    <p class="text-text-primary/60 text-sm">Get QR code & 6-digit code.</p>
+                </div>
+                <div class="p-8 rounded-2xl bg-white shadow-lg text-center">
+                    <div class="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="primary">
+                            <rect x="2" y="2" width="20" height="20" rx="2" ry="2"/>
+                            <path d="M16 18v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4"/>
+                            <line x1="8" y1="13" x2="16" y2="13" stroke="currentColor" stroke-width="1.5"/>
+                            <line x1="12" y1="15" x2="12" y2="19" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-navy mb-3">Download Files</h3>
+                    <p class="text-text-primary/60 text-sm">Scan QR or enter code to receive.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Security Section -->
+    <section id="security" class="py-16 bg-navy text-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-3xl font-bold mb-8 text-center">Security First</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="p-8 rounded-2xl bg-white/10 text-center">
+                    <div class="w-14 h-14 rounded-xl bg-primary/20 flex items-center justify-center mx-auto mb-4">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="primary">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">AES-256-GCM</h3>
+                    <p class="text-text-primary/60 text-sm">End-to-end encrypted on your device.</p>
+                </div>
+                <div class="p-8 rounded-2xl bg-white/10 text-center">
+                    <div class="w-14 h-14 rounded-xl bg-primary/20 flex items-center justify-center mx-auto mb-4">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="primary">
+                            <rect x="2" y="2" width="20" height="20" rx="2" ry="2"/>
+                            <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+                            <polyline points="22 4 12 14 9 10.5 2 11"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Secure Codes</h3>
+                    <p class="text-text-primary/60 text-sm">Unpredictable transfer identifiers.</p>
+                </div>
+                <div class="p-8 rounded-2xl bg-white/10 text-center">
+                    <div class="w-14 h-14 rounded-xl bg-primary/20 flex items-center justify-center mx-auto mb-4">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="primary">
+                            <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/>
+                            <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                            <line x1="9" y1="9" x2="9.01" y2="9"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Auto Expiration</h3>
+                    <p class="text-text-primary/60 text-sm">Files expire after set time.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-3xl font-bold text-navy text-center mb-12">Simple Pricing</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="p-8 rounded-2xl bg-white shadow-lg border border-border">
+                    <div class="flex items-center gap-2 mb-6">
+                        <span class="text-xl font-bold text-navy">Free</span>
+                        <span class="text-xs text-text-primary/60">Forever</span>
+                    </div>
+                    <div class="text-3xl font-bold text-navy mb-6">$0</div>
+                    <ul class="space-y-4 text-text-primary/60 text-sm mb-8">
+                        <li>✓ Up to 50 MB per transfer</li>
+                        <li>✓ QR code generation</li>
+                        <li>✓ 6-digit transfer codes</li>
+                        <li>✓ File downloads on any device</li>
+                        <li>✓ Share codes with others</li>
+                    </ul>
+                    <button class="w-full py-3 rounded-md bg-primary text-white font-medium text-sm">Get Started Free</button>
+                </div>
+                <div class="p-8 rounded-2xl bg-primary text-white shadow-lg border border-primary/20">
+                    <div class="flex items-center gap-2 mb-6">
+                        <span class="text-xl font-bold">Premium</span>
+                        <span class="text-xs text-primary/20">Most Popular</span>
+                    </div>
+                    <div class="text-3xl font-bold text-white mb-6">$9.99<span class="text-sm font-normal">/mo</span></div>
+                    <ul class="space-y-4 text-white/90 text-sm mb-8">
+                        <li>✓ Unlimited transfers</li>
+                        <li>✓ 30-day secure storage</li>
+                        <li>✓ Unlimited downloads</li>
+                        <li>✓ Transfer history & management</li>
+                        <li>✓ Priority support</li>
+                    </ul>
+                    <button class="w-full py-3 rounded-md bg-white text-primary font-medium text-sm">Get Premium</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 bg-white border-t border-border">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <div class="flex items-center gap-2 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                    <svg width="28" height="28" viewBox="0 0 100 100" fill="none">
+                        <circle cx="50" cy="50" r="45" fill="currentColor"/>
+                        <path d="M50 35 L50 20 L70 40 L75 45 L70 50 L50 70 L30 50 L25 45 L30 50 L50 35 Z" fill="white"/>
+                        <path d="M50 65 L50 80 L30 85 L25 80 L30 75 L50 55 L70 75 L75 80 L70 85 L50 80 Z" fill="white"/>
+                    </svg>
+                </div>
+                <span class="text-xl font-bold text-navy">SecureShare</span>
+            </div>
+            <p class="text-text-primary/60 text-sm mb-6">Private file sharing between devices. End-to-end encrypted.</p>
+            <div class="flex justify-center gap-6 text-sm text-text-primary/60 mb-6">
+                <a href="#" class="hover:text-primary transition-colors">Privacy</a>
+                <a href="#" class="hover:text-primary transition-colors">Terms</a>
+                <a href="#" class="hover:text-primary transition-colors">Contact</a>
+            </div>
+            <p class="text-xs text-text-primary/60">© 2024 SecureShare. All rights reserved.</p>
+        </div>
+    </footer>
 </body>
 </html>

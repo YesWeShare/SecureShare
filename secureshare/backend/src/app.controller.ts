@@ -1,67 +1,123 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Headers,
+  Ip,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  Res,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Throttle } from '@nestjs/throttler';
+import type { Response } from 'express';
+import { memoryStorage } from 'multer';
 import { AppService } from './app.service';
-import { AuthGuard } from './auth/auth.guard';
+import { TransferService } from './transfers/transfer.service';
+import {
+  CompleteTransferDto,
+  CreateTransferDto,
+  OpaqueRegistrationStartDto,
+  ReceiveCodeFinishDto,
+  ReceiveCodeStartDto,
+} from './transfers/transfer.dto';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    private readonly transferService: TransferService,
+  ) {}
 
   @Get()
   getHello(): string {
     return this.appService.getHello();
   }
 
-  @Post('upload/initialize')
-  @UseGuards(AuthGuard)
-  async initializeUpload(@Body() body: any, @Req() request: any) {
-    return this.appService.initializeUpload(body, request.user);
+  @Post('transfers')
+  createTransfer(@Body() body: CreateTransferDto) {
+    return this.transferService.createTransfer(body);
   }
 
-  @Post('transfer/qr')
-  @UseGuards(AuthGuard)
-  async createQrTransfer(@Body() body: any, @Req() request: any) {
-    return this.appService.createQrTransfer(body, request.user);
+  @Post('transfers/:id/opaque/register/start')
+  startRegistration(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Headers('x-owner-token') ownerToken: string | undefined,
+    @Body() body: OpaqueRegistrationStartDto,
+  ) {
+    return this.transferService.startRegistration(id, ownerToken, body.registrationRequest);
   }
 
-  @Post('transfer/code')
-  @UseGuards(AuthGuard)
-  async verifyCode(@Body() body: any, @Req() request: any) {
-    return this.appService.verifyCode(body.code, request.user);
+  @Post('transfers/:id/files/:fileId')
+  @UseInterceptors(FileInterceptor('file', {
+    storage: memoryStorage(),
+    limits: { fileSize: 50 * 1024 * 1024 + 1600, files: 1 },
+  }))
+  uploadFile(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('fileId', ParseUUIDPipe) fileId: string,
+    @Headers('x-owner-token') ownerToken: string | undefined,
+    @UploadedFile() file: { buffer: Buffer; size: number } | undefined,
+  ) {
+    if (!file) throw new BadRequestException('Encrypted file body is required');
+    return this.transferService.uploadFile(id, fileId, ownerToken, file.buffer);
   }
 
-  @Post('pairing/request')
-  @UseGuards(AuthGuard)
-  async requestPairing(@Body() body: any, @Req() request: any) {
-    return this.appService.requestPairing(request.user, body.transferId);
+  @Post('transfers/:id/complete')
+  completeTransfer(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Headers('x-owner-token') ownerToken: string | undefined,
+    @Body() body: CompleteTransferDto,
+  ) {
+    return this.transferService.completeTransfer(id, ownerToken, body);
   }
 
-  @Post('pairing/approve')
-  @UseGuards(AuthGuard)
-  async approvePairing(@Body() body: any, @Req() request: any) {
-    return this.appService.approvePairing(request.user, body.transferId, body.receiverPublicKey);
+  @Get('transfers/:id/manifest')
+  getManifest(@Param('id', ParseUUIDPipe) id: string) {
+    return this.transferService.getManifest(id);
   }
 
-  @Get('transfers')
-  @UseGuards(AuthGuard)
-  async getTransfers(@Req() request: any) {
-    return this.appService.getTransfers(request.user);
+  @Get('transfers/:id/files/:fileId')
+  async downloadFile(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('fileId', ParseUUIDPipe) fileId: string,
+    @Res() response: Response,
+  ): Promise<void> {
+    const encryptedFile = await this.transferService.downloadFile(id, fileId);
+    response
+      .set({
+        'Content-Type': 'application/octet-stream',
+        'Content-Length': encryptedFile.length,
+        'Content-Disposition': 'attachment; filename="encrypted.bin"',
+        'Cache-Control': 'no-store',
+        'X-Content-Type-Options': 'nosniff',
+        'Referrer-Policy': 'no-referrer',
+      })
+      .send(encryptedFile);
+  }
+
+  @Post('receive/code/start')
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  startCodeReceive(@Ip() ip: string, @Body() body: ReceiveCodeStartDto) {
+    return this.transferService.startCodeReceive(ip, body.code, body.startLoginRequest);
+  }
+
+  @Post('receive/code/finish')
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  finishCodeReceive(@Body() body: ReceiveCodeFinishDto) {
+    return this.transferService.finishCodeReceive(body.sessionId, body.finishLoginRequest);
   }
 
   @Delete('transfers/:id')
-  @UseGuards(AuthGuard)
-  async deleteTransfer(@Param('id') id: string, @Req() request: any) {
-    return this.appService.deleteTransfer(id, request.user);
-  }
-
-  @Post('download/secure')
-  @UseGuards(AuthGuard)
-  async getSecureDownload(@Body() body: any, @Req() request: any) {
-    return this.appService.getSecureDownload(body, request.user);
-  }
-
-  @Get('dashboard')
-  @UseGuards(AuthGuard)
-  async getDashboard(@Req() request: any) {
-    return this.appService.getDashboard(request.user);
+  deleteTransfer(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Headers('x-owner-token') ownerToken: string | undefined,
+  ) {
+    return this.transferService.deleteTransfer(id, ownerToken);
   }
 }
